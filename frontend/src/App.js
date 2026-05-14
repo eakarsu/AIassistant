@@ -18,6 +18,8 @@ import Notifications from './pages/Notifications';
 import Users from './pages/Users';
 import Profile from './pages/Profile';
 import Analytics from './pages/Analytics';
+import AIHub from './pages/AIHub';
+import Extensions from './pages/Extensions';
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('token');
@@ -48,6 +50,8 @@ function App() {
         <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+        <Route path="/ai-hub" element={<ProtectedRoute><AIHub /></ProtectedRoute>} />
+        <Route path="/extensions" element={<ProtectedRoute><Extensions /></ProtectedRoute>} />
       </Routes>
     </div>
   );

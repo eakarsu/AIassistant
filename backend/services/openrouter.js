@@ -1,9 +1,10 @@
 const https = require('https');
+const { parseAIJson } = require('../parseAIJson');
 
 class OpenRouterService {
   constructor() {
     this.apiKey = process.env.OPENROUTER_API_KEY;
-    this.model = process.env.OPENROUTER_MODEL || 'anthropic/claude-haiku-4.5';
+    this.model = process.env.OPENROUTER_MODEL || 'anthropic/claude-3-5-sonnet-20241022';
     this.baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
   }
 
@@ -85,13 +86,9 @@ Provide a detailed radiological analysis with structured findings.`
 
     const response = await this._makeRequest(messages);
 
-    try {
-      const jsonMatch = response.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
-      }
-    } catch (e) {
-      // If JSON parsing fails, return structured text response
+    {
+      const _p = parseAIJson(response);
+      if (_p.ok) return _p.data;
     }
 
     return {
@@ -122,13 +119,9 @@ Suggest similar prior studies and comparison points.`
 
     const response = await this._makeRequest(messages);
 
-    try {
-      const jsonMatch = response.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
-      }
-    } catch (e) {
-      // Fall through to default response
+    {
+      const _p = parseAIJson(response);
+      if (_p.ok) return _p.data;
     }
 
     return {
@@ -165,13 +158,9 @@ Generate a complete, structured radiology report.`
 
     const response = await this._makeRequest(messages);
 
-    try {
-      const jsonMatch = response.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
-      }
-    } catch (e) {
-      // Fall through to default response
+    {
+      const _p = parseAIJson(response);
+      if (_p.ok) return _p.data;
     }
 
     return {
@@ -203,13 +192,9 @@ Provide a concise, clinically relevant impression.`
 
     const response = await this._makeRequest(messages);
 
-    try {
-      const jsonMatch = response.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
-      }
-    } catch (e) {
-      // Fall through to default response
+    {
+      const _p = parseAIJson(response);
+      if (_p.ok) return _p.data;
     }
 
     return {

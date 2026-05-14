@@ -1,6 +1,23 @@
 -- Migration: Add new non-AI feature tables
 -- Run after init.sql
 
+-- ai_results table — JSONB store for all AI feature outputs (audit pattern)
+CREATE TABLE IF NOT EXISTS ai_results (
+  id SERIAL PRIMARY KEY,
+  feature VARCHAR(100) NOT NULL,
+  user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  entity_type VARCHAR(50),
+  entity_id INTEGER,
+  prompt_summary TEXT,
+  result JSONB NOT NULL DEFAULT '{}'::jsonb,
+  model VARCHAR(100),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_ai_results_feature ON ai_results (feature);
+CREATE INDEX IF NOT EXISTS idx_ai_results_user ON ai_results (user_id);
+CREATE INDEX IF NOT EXISTS idx_ai_results_entity ON ai_results (entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_ai_results_created ON ai_results (created_at DESC);
+
 -- Departments table
 CREATE TABLE IF NOT EXISTS departments (
   id SERIAL PRIMARY KEY,

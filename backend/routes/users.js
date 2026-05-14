@@ -1,6 +1,7 @@
 const express = require('express');
 const pool = require('../db/pool');
-const bcrypt = require('bcrypt');
+// Apply pass 5: switched from `bcrypt` (not installed) to API-compatible `bcryptjs`.
+const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 

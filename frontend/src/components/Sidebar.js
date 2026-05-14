@@ -2,24 +2,26 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const navItems = [
-  { path: '/dashboard', label: 'Dashboard', icon: '\u2302' },
+  { path: '/dashboard', label: 'Dashboard', icon: '⌂' },
   { section: 'Clinical' },
-  { path: '/images', label: 'Images', icon: '\uD83D\uDD2C' },
-  { path: '/analysis', label: 'AI Analysis', icon: '\uD83E\uDDE0' },
-  { path: '/studies', label: 'Prior Studies', icon: '\uD83D\uDCDA' },
-  { path: '/reports', label: 'Reports', icon: '\uD83D\uDCCB' },
+  { path: '/images', label: 'Images', icon: '🔬' },
+  { path: '/analysis', label: 'AI Analysis', icon: '🧠' },
+  { path: '/ai-hub', label: 'AI Hub', icon: '✨' },
+  { path: '/studies', label: 'Prior Studies', icon: '📚' },
+  { path: '/reports', label: 'Reports', icon: '📋' },
   { section: 'Operations' },
-  { path: '/appointments', label: 'Appointments', icon: '\uD83D\uDCC5' },
-  { path: '/patients', label: 'Patients', icon: '\uD83D\uDC64' },
-  { path: '/referring-physicians', label: 'Referring Docs', icon: '\uD83D\uDCE8' },
-  { path: '/billing', label: 'Billing', icon: '\uD83D\uDCB0' },
+  { path: '/appointments', label: 'Appointments', icon: '📅' },
+  { path: '/patients', label: 'Patients', icon: '👤' },
+  { path: '/referring-physicians', label: 'Referring Docs', icon: '📨' },
+  { path: '/billing', label: 'Billing', icon: '💰' },
   { section: 'Administration' },
-  { path: '/radiologists', label: 'Radiologists', icon: '\uD83D\uDC68\u200D\u2695\uFE0F' },
-  { path: '/departments', label: 'Departments', icon: '\uD83C\uDFE5' },
-  { path: '/users', label: 'Users', icon: '\uD83D\uDD12' },
-  { path: '/analytics', label: 'Analytics', icon: '\uD83D\uDCCA' },
-  { path: '/audit-log', label: 'Audit Log', icon: '\uD83D\uDDD2' },
-  { path: '/notifications', label: 'Notifications', icon: '\uD83D\uDD14' },
+  { path: '/radiologists', label: 'Radiologists', icon: '👨‍⚕️' },
+  { path: '/departments', label: 'Departments', icon: '🏥' },
+  { path: '/users', label: 'Users', icon: '🔒' },
+  { path: '/analytics', label: 'Analytics', icon: '📊' },
+  { path: '/audit-log', label: 'Audit Log', icon: '🗒' },
+  { path: '/notifications', label: 'Notifications', icon: '🔔' },
+  { path: '/extensions', label: 'Extensions', icon: '🔌' },
 ];
 
 function Sidebar() {
@@ -39,7 +41,7 @@ function Sidebar() {
   return (
     <div className="sidebar">
       <div className="sidebar-logo">
-        <span className="logo-icon">{'\u2695\uFE0F'}</span>
+        <span className="logo-icon">{'⚕️'}</span>
         <h2>Radiology<span>AI</span></h2>
       </div>
 
@@ -74,7 +76,7 @@ function Sidebar() {
           </div>
         </div>
         <button className="logout-btn" onClick={handleLogout}>
-          <span className="nav-icon">{'\uD83D\uDEAA'}</span>
+          <span className="nav-icon">{'🚪'}</span>
           <span>Logout</span>
         </button>
       </div>
