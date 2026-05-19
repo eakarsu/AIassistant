@@ -20,6 +20,7 @@ import Profile from './pages/Profile';
 import Analytics from './pages/Analytics';
 import AIHub from './pages/AIHub';
 import Extensions from './pages/Extensions';
+import CustomViewsPage from './pages/CustomViewsPage';
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('token');
@@ -52,6 +53,7 @@ function App() {
         <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
         <Route path="/ai-hub" element={<ProtectedRoute><AIHub /></ProtectedRoute>} />
         <Route path="/extensions" element={<ProtectedRoute><Extensions /></ProtectedRoute>} />
+        <Route path="/custom-views" element={<ProtectedRoute><CustomViewsPage /></ProtectedRoute>} />
       </Routes>
     </div>
   );

@@ -22,6 +22,7 @@ const navItems = [
   { path: '/audit-log', label: 'Audit Log', icon: '🗒' },
   { path: '/notifications', label: 'Notifications', icon: '🔔' },
   { path: '/extensions', label: 'Extensions', icon: '🔌' },
+  { path: '/custom-views', label: 'Assistant Views', icon: '🪄' },
 ];
 
 function Sidebar() {

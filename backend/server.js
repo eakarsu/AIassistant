@@ -181,6 +181,9 @@ app.use('/api/users', authenticateToken, userRoutes);
 // Apply pass 5 — extensions (auth handled per-route inside the router)
 app.use('/api', extensionsRoutes);
 
+// === Custom Views (Assistant Views) — 2 viz + 2 non-viz ===
+app.use('/api/custom-views', require('./routes/customViews'));
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
