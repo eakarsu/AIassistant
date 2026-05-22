@@ -21,6 +21,12 @@ import Analytics from './pages/Analytics';
 import AIHub from './pages/AIHub';
 import Extensions from './pages/Extensions';
 import CustomViewsPage from './pages/CustomViewsPage';
+import CriticalFindingsQueue from './pages/CriticalFindingsQueue';
+
+import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
+import CodexOperationsFeature from './pages/CodexOperationsFeature';
+
+import TimelineView from './pages/TimelineView';
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('token');
@@ -34,6 +40,10 @@ function App() {
   return (
     <div className="App">
       <Routes>
+        <Route path="/insights/timeline" element={<ProtectedRoute><TimelineView /></ProtectedRoute>} />
+        <Route path="/codex/custom-viz" element={<ProtectedRoute><CodexCustomVizFeature /></ProtectedRoute>} />
+        <Route path="/codex/operations" element={<ProtectedRoute><CodexOperationsFeature /></ProtectedRoute>} />
+
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/images" element={<ProtectedRoute><Images /></ProtectedRoute>} />
@@ -54,6 +64,7 @@ function App() {
         <Route path="/ai-hub" element={<ProtectedRoute><AIHub /></ProtectedRoute>} />
         <Route path="/extensions" element={<ProtectedRoute><Extensions /></ProtectedRoute>} />
         <Route path="/custom-views" element={<ProtectedRoute><CustomViewsPage /></ProtectedRoute>} />
+        <Route path="/critical-findings-queue" element={<ProtectedRoute><CriticalFindingsQueue /></ProtectedRoute>} />
       </Routes>
     </div>
   );

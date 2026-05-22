@@ -22,6 +22,7 @@ const billingRoutes = require('./routes/billing');
 const auditRoutes = require('./routes/audit');
 const notificationRoutes = require('./routes/notifications');
 const userRoutes = require('./routes/users');
+const criticalFindingsRoutes = require('./routes/criticalFindingsQueue');
 // Apply pass 5 — backlog extensions (DICOM registry, EHR, teleradiology)
 const extensionsRoutes = require('./routes/extensions');
 const { authenticateToken } = require('./middleware/auth');
@@ -84,6 +85,7 @@ app.use(express.json({ limit: '10mb' }));
 
 // Public routes
 app.use('/api/auth', authRoutes);
+app.use('/api/critical-findings-queue', criticalFindingsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
