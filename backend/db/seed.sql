@@ -1,3 +1,9 @@
+\if :{?allow_demo_seed}
+\else
+\echo 'Demo seed disabled; pass -v allow_demo_seed=1 only for an isolated non-production database.'
+\quit
+\endif
+
 -- Seed Users
 INSERT INTO users (email, password, name, role) VALUES
 ('admin@radiology.com', '$2a$10$t5lUk8VZUEwsyrvNxABSn.3wUFDCK29nCrHerbBJYuiAxsii3KWpi', 'Admin User', 'admin'),

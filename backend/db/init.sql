@@ -1,3 +1,9 @@
+\if :{?allow_legacy_reset}
+\else
+\echo 'Legacy destructive reset disabled; pass -v allow_legacy_reset=1 only for an isolated non-production database.'
+\quit
+\endif
+
 -- Drop tables in reverse dependency order
 DROP TABLE IF EXISTS reports CASCADE;
 DROP TABLE IF EXISTS prior_studies CASCADE;

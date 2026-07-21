@@ -78,6 +78,10 @@ htmlcov/
 **/credentials*.json
 **/serviceAccount*.json
 
+# Keep sanitized examples after all secret globs.
+!.env.example
+!**/.env.example
+
 # --- secrets: never commit ---
 .env
 .env.*
@@ -91,3 +95,7 @@ token.txt
 id_rsa*
 **/credentials*.json
 **/serviceAccount*.json
+
+# Keep sanitized examples after every secret glob.
+!.env.example
+!**/.env.example
