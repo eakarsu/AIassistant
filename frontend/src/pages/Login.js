@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const API = axios.create({ baseURL: 'http://localhost:3001' });
+const API = axios.create({ baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3001' });
 
 function Login() {
   const navigate = useNavigate();
@@ -29,8 +29,8 @@ function Login() {
   };
 
   const handleQuickLogin = () => {
-    setEmail('admin@radiology.com');
-    setPassword('password123');
+    setEmail('runtime-admin@example.com');
+    setPassword('RuntimeAcceptance123!');
   };
 
   return (

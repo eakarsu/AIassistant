@@ -28,6 +28,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/governance', require('./governance/router'));
 
 app.use('/api', authenticateToken);
+app.use('/api/runtime-ai', require('./routes/runtimeAi'));
 const protectedRoutes = [
   ['/api/patients','./routes/patients'],['/api/radiologists','./routes/radiologists'],
   ['/api/images','./routes/images'],['/api/analyses','./routes/analysis'],
