@@ -29,8 +29,8 @@ function Login() {
   };
 
   const handleQuickLogin = () => {
-    setEmail('runtime-admin@example.com');
-    setPassword('RuntimeAcceptance123!');
+    setEmail(process.env.REACT_APP_DEMO_EMAIL || '');
+    setPassword(process.env.REACT_APP_DEMO_PASSWORD || '');
   };
 
   return (
