@@ -1,9 +1,10 @@
+import NativeAIControls from "../components/NativeAIControls.jsx";
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar';
 import DetailModal from '../components/DetailModal';
 import FormModal from '../components/FormModal';
-import AIOutput from '../components/AIOutput';
+import AIReport from '../components/AIReport';
 import { ToastContainer, useToast } from '../components/Toast';
 
 const detailFields = [
@@ -168,7 +169,7 @@ function Analysis() {
           <h1>AI Image Analysis</h1>
           <div className="page-toolbar">
             <div className="search-bar">
-              <input
+              <input data-ai-field={"search"}
                 type="text"
                 placeholder="Search analyses..."
                 value={search}
@@ -188,12 +189,13 @@ function Analysis() {
         </div>
 
         {showSimilarSearch && (
+          <NativeAIControls busy={searchLoading} context="similar-study search">
           <div className="ai-search-form">
             <h3>{'\uD83E\uDDE0'} AI Similar Study Search</h3>
             <div className="ai-search-fields">
               <div className="form-group">
                 <label>Findings</label>
-                <input
+                <input data-ai-field={"similarFindings"}
                   type="text"
                   value={similarFindings}
                   onChange={e => setSimilarFindings(e.target.value)}
@@ -202,7 +204,7 @@ function Analysis() {
               </div>
               <div className="form-group">
                 <label>Modality</label>
-                <select
+                <select data-ai-field={"similarModality"}
                   className="filter-select"
                   value={similarModality}
                   onChange={e => setSimilarModality(e.target.value)}
@@ -217,7 +219,7 @@ function Analysis() {
               </div>
               <div className="form-group">
                 <label>Body Part</label>
-                <input
+                <input data-ai-field={"similarBodyPart"}
                   type="text"
                   value={similarBodyPart}
                   onChange={e => setSimilarBodyPart(e.target.value)}
@@ -233,9 +235,10 @@ function Analysis() {
               </button>
             </div>
             {(searchLoading || searchResult) && (
-              <AIOutput data={searchResult} type="search" isLoading={searchLoading} />
+              <AIReport response={searchResult} title="Similar study results" loading={searchLoading} />
             )}
           </div>
+          </NativeAIControls>
         )}
 
         {loading ? (
@@ -282,6 +285,14 @@ function Analysis() {
             onEdit={handleEdit}
             onDelete={handleDelete}
           >
+            <AIReport response={{
+              findings: selectedItem.findings,
+              confidence_score: selectedItem.confidence_score,
+              areas_of_interest: selectedItem.areas_of_interest,
+              ai_model: selectedItem.ai_model,
+              status: selectedItem.status,
+              review_notes: selectedItem.review_notes,
+            }} title="Saved AI analysis" />
             <div style={{ marginTop: 16, display: 'flex', gap: 12 }}>
               <button
                 className="btn btn-ai"
@@ -292,7 +303,7 @@ function Analysis() {
               </button>
             </div>
             {(aiLoading || aiResult) && (
-              <AIOutput data={aiResult} type="analysis" isLoading={aiLoading} />
+              <AIReport response={aiResult} title="Current AI analysis" loading={aiLoading} />
             )}
           </DetailModal>
         )}

@@ -10,6 +10,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -28,9 +29,25 @@ function Login() {
     }
   };
 
-  const handleQuickLogin = () => {
-    setEmail(process.env.REACT_APP_DEMO_EMAIL || '');
-    setPassword(process.env.REACT_APP_DEMO_PASSWORD || '');
+  const handleQuickLogin = async () => {
+    setDemoLoading(true);
+    setError('');
+    try {
+      let demoEmail = process.env.REACT_APP_DEMO_EMAIL;
+      let demoPassword = process.env.REACT_APP_DEMO_PASSWORD;
+      if (!demoEmail || !demoPassword) {
+        const response = await API.get('/api/auth/demo-credentials');
+        demoEmail = response.data?.email;
+        demoPassword = response.data?.password;
+      }
+      if (!demoEmail || !demoPassword) throw new Error('Demo credentials are not configured');
+      setEmail(demoEmail);
+      setPassword(demoPassword);
+    } catch (failure) {
+      setError(failure.response?.data?.error || 'Demo credentials are unavailable in this environment.');
+    } finally {
+      setDemoLoading(false);
+    }
   };
 
   return (
@@ -66,8 +83,8 @@ function Login() {
           <button type="submit" className="login-btn" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
-          <button type="button" className="quick-login-btn" onClick={handleQuickLogin}>
-            Auto Fill Demo Credentials
+          <button type="button" className="quick-login-btn" onClick={handleQuickLogin} disabled={loading || demoLoading}>
+            {demoLoading ? 'Loading Demo Credentials...' : 'Fill Demo Credentials'}
           </button>
         </form>
       </div>

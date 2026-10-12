@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar';
+import AIReport from '../components/AIReport';
 
 // Apply pass 5 — Extensions surface (DICOM registry, EHR, Teleradiology).
 // Reuses existing CSS classes from App.css. JWT bearer from localStorage.
@@ -44,6 +45,8 @@ export default function Extensions() {
 function DicomPanel() {
   const [studies, setStudies] = useState([]);
   const [err, setErr] = useState('');
+  const [advisoryResult, setAdvisoryResult] = useState(null);
+  const [advisoryLoading, setAdvisoryLoading] = useState(false);
   const [form, setForm] = useState({ patient_id: '', study_uid: '', modality: 'CT', body_part: '' });
   const load = useCallback(async () => {
     try {
@@ -62,14 +65,19 @@ function DicomPanel() {
     } catch (e) { setErr(e?.response?.data?.error || e.message); }
   };
   const advisory = async (id) => {
+    setAdvisoryLoading(true);
+    setAdvisoryResult(null);
+    setErr('');
     try {
       const r = await axios.post('/api/dicom-cad-advisory', { dicom_study_id: id }, authConfig());
-      alert(JSON.stringify(r.data.advisory, null, 2).slice(0, 1500));
+      setAdvisoryResult(r.data.advisory);
     } catch (e) {
       const status = e?.response?.status;
       const data = e?.response?.data || {};
-      if (status === 503) alert(`AI not configured: missing ${data.missing || 'OPENROUTER_API_KEY'}`);
-      else alert(data.error || e.message);
+      if (status === 503) setErr(`AI not configured: missing ${data.missing || 'OPENROUTER_API_KEY'}`);
+      else setErr(data.error || e.message);
+    } finally {
+      setAdvisoryLoading(false);
     }
   };
   return (
@@ -92,11 +100,12 @@ function DicomPanel() {
             <tr key={s.id}>
               <td>{s.id}</td><td>{s.patient_id || '—'}</td><td style={{ fontFamily: 'monospace', fontSize: 11 }}>{s.study_uid}</td>
               <td>{s.modality}</td><td>{s.body_part || '—'}</td><td>{new Date(s.created_at).toLocaleString()}</td>
-              <td><button className="btn" onClick={() => advisory(s.id)}>CAD Advisory</button></td>
+              <td><button className="btn" disabled={advisoryLoading} onClick={() => advisory(s.id)}>{advisoryLoading ? 'Preparing…' : 'CAD Advisory'}</button></td>
             </tr>
           ))}
         </tbody>
       </table>
+      <AIReport response={advisoryResult} title="CAD advisory" loading={advisoryLoading} />
     </div>
   );
 }

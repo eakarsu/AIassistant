@@ -1,7 +1,8 @@
+import NativeAIControls from "../components/NativeAIControls.jsx";
+import AIReport from '../components/AIReport';
 import React, { useState, useCallback } from 'react';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar';
-import AIOutput from '../components/AIOutput';
 import { ToastContainer, useToast } from '../components/Toast';
 
 // All 7 new audit AI features wired into one hub page.
@@ -57,7 +58,7 @@ const TOOLS = [
   },
 ];
 
-const fieldsByTool = {
+export const fieldsByTool = {
   'report-templating': [
     { key: 'modality', label: 'Modality', type: 'select', options: ['CT', 'MRI', 'X-Ray', 'Ultrasound', 'PET', 'Mammography'] },
     { key: 'body_part', label: 'Body Part', type: 'text' },
@@ -97,6 +98,45 @@ const fieldsByTool = {
     { key: 'reading_level', label: 'Reading level', type: 'select', options: ['grade 5', 'grade 7', 'grade 9', 'high school'] },
     { key: 'patient_id', label: 'Patient ID', type: 'number' },
     { key: 'report_text', label: 'Full report text', type: 'textarea', required: true },
+  ],
+};
+
+const PRESET_NAMES = ['Acute chest CT', 'Neuro follow-up', 'Routine screening'];
+export const TOOL_PRESETS = {
+  'report-templating': [
+    { modality: 'CT', body_part: 'Chest', findings: 'CTA chest demonstrates a central filling defect in the right lower lobe pulmonary artery. No right-heart strain. Small right pleural effusion.', specialty: 'chest' },
+    { modality: 'MRI', body_part: 'Brain', findings: 'Stable periventricular T2/FLAIR hyperintensities without restricted diffusion or new enhancement compared with the prior study.', specialty: 'neuro' },
+    { modality: 'Mammography', body_part: 'Bilateral breasts', findings: 'Screening views show scattered fibroglandular density without suspicious mass, distortion, or grouped calcifications.', specialty: 'general' },
+  ],
+  'prior-study-comparison': [
+    { patient_id: 1, modality: 'CT', body_part: 'Chest', current_findings: 'New 6 mm right lower lobe pulmonary nodule; compare size and morphology with all available prior chest CT examinations.' },
+    { patient_id: 2, modality: 'MRI', body_part: 'Brain', current_findings: 'Periventricular FLAIR lesions are unchanged. No new enhancement or restricted diffusion.' },
+    { patient_id: 3, modality: 'X-Ray', body_part: 'Chest', current_findings: 'No focal air-space opacity. Cardiomediastinal silhouette is stable.' },
+  ],
+  'turnaround-predictor': [
+    { modality: 'CT', complexity: 5, queue_length: 12 },
+    { modality: 'MRI', complexity: 4, queue_length: 7 },
+    { modality: 'X-Ray', complexity: 2, queue_length: 18 },
+  ],
+  'incidental-findings': [
+    { primary_indication: 'Pulmonary embolism evaluation', patient_id: 1, findings_text: 'No pulmonary embolism. Incidental 6 mm solid right lower lobe pulmonary nodule and a 1.8 cm left thyroid nodule are present.' },
+    { primary_indication: 'Headache', patient_id: 2, findings_text: 'No acute intracranial abnormality. Mild mucosal thickening in the maxillary sinuses is incidentally noted.' },
+    { primary_indication: 'Screening mammography', patient_id: 3, findings_text: 'No suspicious breast finding. Benign vascular calcifications are present.' },
+  ],
+  'qa-audit': [
+    { image_summary: 'CTA chest for acute dyspnea; right lower lobe segmental embolus without right-heart strain.', image_id: 1, report_a: 'Segmental pulmonary embolus in the right lower lobe. No CT evidence of right-heart strain.', report_b: 'Acute right lower lobe pulmonary embolus. RV/LV ratio is normal. Small right pleural effusion.' },
+    { image_summary: 'Brain MRI follow-up for demyelinating disease.', image_id: 2, report_a: 'Stable periventricular lesions. No active enhancement.', report_b: 'Unchanged white-matter lesion burden without enhancing plaque.' },
+    { image_summary: 'Routine frontal and lateral chest radiographs.', image_id: 3, report_a: 'No acute cardiopulmonary abnormality.', report_b: 'Clear lungs. Normal cardiomediastinal silhouette.' },
+  ],
+  'insurance-preauth': [
+    { procedure_code: '71275', diagnosis: 'R06.02 shortness of breath; suspected pulmonary embolism', payer: 'Example Health PPO', patient_id: 1, patient_history: 'Acute dyspnea and elevated D-dimer; no iodinated contrast allergy documented.' },
+    { procedure_code: '70553', diagnosis: 'G35 multiple sclerosis follow-up', payer: 'Example Regional Plan', patient_id: 2, patient_history: 'Known demyelinating disease with interval neurologic symptoms; prior MRI available.' },
+    { procedure_code: '77067', diagnosis: 'Z12.31 screening mammogram', payer: 'Example Medicare Plan', patient_id: 3, patient_history: 'Routine annual screening; no current breast symptoms.' },
+  ],
+  'patient-portal-summary': [
+    { reading_level: 'grade 7', patient_id: 1, report_text: 'CTA chest shows a small blood clot in a right lower lobe pulmonary artery. There is no imaging evidence of strain on the right side of the heart.' },
+    { reading_level: 'grade 9', patient_id: 2, report_text: 'Brain MRI findings are stable compared with the prior examination. No new or enhancing demyelinating lesion is identified.' },
+    { reading_level: 'grade 5', patient_id: 3, report_text: 'Screening mammogram shows no suspicious mass or calcifications. Continue routine annual screening.' },
   ],
 };
 
@@ -144,9 +184,23 @@ function AIHub() {
 
   const tool = TOOLS.find((t) => t.id === active);
   const fields = active ? fieldsByTool[active] || [] : [];
+  const presetChoices = PRESET_NAMES.map((name, index) => ({
+    name,
+    fill: () => {
+      if (!active) return { filled: 0, manual: [] };
+      const example = TOOL_PRESETS[active]?.[index] || {};
+      const next = Object.fromEntries(fields.map((field) => {
+        const preserveReference = ['patient_id', 'image_id'].includes(field.key) && form[field.key] !== undefined && form[field.key] !== '';
+        return [field.key, preserveReference ? form[field.key] : example[field.key]];
+      }));
+      setForm(next);
+      setResult(null);
+      return { filled: fields.filter((field) => next[field.key] !== undefined && next[field.key] !== '').length, manual: [] };
+    },
+  }));
 
   return (
-    <div className="page-layout">
+    <NativeAIControls busy={loading} context={tool?.name || 'radiology assistant'} presets={presetChoices}><div className="page-layout">
       <Sidebar />
       <div className="page-content">
         <ToastContainer toasts={toasts} removeToast={removeToast} />
@@ -195,20 +249,20 @@ function AIHub() {
                     {f.label}{f.required ? ' *' : ''}
                   </label>
                   {f.type === 'textarea' ? (
-                    <textarea rows={f.key === 'findings' || f.key === 'current_findings' || f.key === 'findings_text' || f.key === 'report_a' || f.key === 'report_b' || f.key === 'report_text' ? 6 : 3}
+                    <textarea data-ai-field={f.key} rows={f.key === 'findings' || f.key === 'current_findings' || f.key === 'findings_text' || f.key === 'report_a' || f.key === 'report_b' || f.key === 'report_text' ? 6 : 3}
                       style={inputStyle}
                       value={form[f.key] || ''}
                       onChange={(e) => setField(f.key, e.target.value)}
                       required={!!f.required} />
                   ) : f.type === 'select' ? (
-                    <select style={inputStyle}
+                    <select data-ai-field={f.key} style={inputStyle}
                       value={form[f.key] || ''}
                       onChange={(e) => setField(f.key, e.target.value)}>
                       <option value="">Select...</option>
                       {(f.options || []).map((o) => <option key={o} value={o}>{o}</option>)}
                     </select>
                   ) : (
-                    <input type={f.type || 'text'} style={inputStyle}
+                    <input data-ai-field={f.key} type={f.type || 'text'} style={inputStyle}
                       value={form[f.key] || ''}
                       onChange={(e) => setField(f.key, e.target.value)}
                       required={!!f.required} />
@@ -223,10 +277,10 @@ function AIHub() {
         )}
 
         {(loading || result) && (
-          <AIOutput data={result?.result || result} type="report" isLoading={loading} />
+          <AIReport response={result?.result || result} title={`${tool?.name || 'AI'} results`} loading={loading} />
         )}
       </div>
-    </div>
+    </div></NativeAIControls>
   );
 }
 

@@ -3,7 +3,7 @@ import axios from 'axios';
 import Sidebar from '../components/Sidebar';
 import DetailModal from '../components/DetailModal';
 import FormModal from '../components/FormModal';
-import AIOutput from '../components/AIOutput';
+import AIReport from '../components/AIReport';
 import { ToastContainer, useToast } from '../components/Toast';
 
 const detailFields = [
@@ -255,6 +255,14 @@ function Reports() {
             onEdit={handleEdit}
             onDelete={handleDelete}
           >
+            {(selectedItem.status === 'ai_generated' || selectedItem.ai_draft) && <AIReport response={{
+              clinical_history: selectedItem.clinical_history,
+              technique: selectedItem.technique,
+              findings: selectedItem.findings,
+              impression: selectedItem.impression,
+              recommendations: selectedItem.recommendations,
+              ai_draft: selectedItem.ai_draft,
+            }} title="Saved AI report" />}
             <div style={{ marginTop: 16, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <button
                 className="btn btn-ai"
@@ -279,7 +287,7 @@ function Reports() {
               </button>
             </div>
             {(aiLoading || aiResult) && (
-              <AIOutput data={aiResult} type="report" isLoading={aiLoading} />
+              <AIReport response={aiResult} title="Generated report" loading={aiLoading} />
             )}
           </DetailModal>
         )}

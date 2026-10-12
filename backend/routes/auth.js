@@ -5,6 +5,24 @@ const pool = require('../db/pool');
 
 const router = express.Router();
 
+const demoCredentialPairs = () => [
+  [process.env.DEMO_EMAIL, process.env.DEMO_PASSWORD],
+  [process.env.SEED_ADMIN_EMAIL, process.env.SEED_ADMIN_PASSWORD],
+  [process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD],
+  [process.env.DEFAULT_EMAIL, process.env.DEFAULT_PASSWORD],
+];
+
+// Local-only credential fill for the existing configured demo account.
+router.get('/demo-credentials', (_req, res) => {
+  if (process.env.NODE_ENV === 'production' || process.env.ENABLE_DEMO_CREDENTIAL_AUTOFILL !== 'true') {
+    return res.status(404).json({ error: 'Demo credential filling is disabled' });
+  }
+  const credentials = demoCredentialPairs().find(([email, password]) => email && password);
+  if (!credentials) return res.status(503).json({ error: 'Demo credentials are not configured' });
+  res.set('Cache-Control', 'no-store');
+  return res.json({ email: credentials[0], password: credentials[1] });
+});
+
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {

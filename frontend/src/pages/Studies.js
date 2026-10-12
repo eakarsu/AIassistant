@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import NativeAIControls from '../components/NativeAIControls';
+import AIReport from '../components/AIReport';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar';
 import DetailModal from '../components/DetailModal';
 import FormModal from '../components/FormModal';
-import AIOutput from '../components/AIOutput';
 import { ToastContainer, useToast } from '../components/Toast';
 
 const detailFields = [
@@ -191,12 +192,13 @@ function Studies() {
         </div>
 
         {showAiSearch && (
+          <NativeAIControls busy={searchLoading} context="similar-study search">
           <div className="ai-search-form">
             <h3>{'\uD83E\uDDE0'} AI Similar Study Search</h3>
             <div className="ai-search-fields">
               <div className="form-group">
                 <label>Findings</label>
-                <input
+                <input data-ai-field="findings"
                   type="text"
                   value={aiFindings}
                   onChange={e => setAiFindings(e.target.value)}
@@ -205,7 +207,7 @@ function Studies() {
               </div>
               <div className="form-group">
                 <label>Modality</label>
-                <select
+                <select data-ai-field="modality"
                   className="filter-select"
                   value={aiModality}
                   onChange={e => setAiModality(e.target.value)}
@@ -220,7 +222,7 @@ function Studies() {
               </div>
               <div className="form-group">
                 <label>Body Part</label>
-                <input
+                <input data-ai-field="body_part"
                   type="text"
                   value={aiBodyPart}
                   onChange={e => setAiBodyPart(e.target.value)}
@@ -236,9 +238,10 @@ function Studies() {
               </button>
             </div>
             {(searchLoading || searchResult) && (
-              <AIOutput data={searchResult} type="search" isLoading={searchLoading} />
+              <AIReport response={searchResult} title="Similar study results" loading={searchLoading} />
             )}
           </div>
+          </NativeAIControls>
         )}
 
         {loading ? (
