@@ -8,6 +8,7 @@ import Analysis from './pages/Analysis';
 import Studies from './pages/Studies';
 import Reports from './pages/Reports';
 import Patients from './pages/Patients';
+import FeaturePackPanel from './components/FeaturePackPanel';
 import Radiologists from './pages/Radiologists';
 import Departments from './pages/Departments';
 import ReferringPhysicians from './pages/ReferringPhysicians';
@@ -51,6 +52,7 @@ function App() {
         <Route path="/studies" element={<ProtectedRoute><Studies /></ProtectedRoute>} />
         <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
         <Route path="/patients" element={<ProtectedRoute><Patients /></ProtectedRoute>} />
+        <Route path="/feature-pack" element={<ProtectedRoute><FeaturePackPanel /></ProtectedRoute>} />
         <Route path="/radiologists" element={<ProtectedRoute><Radiologists /></ProtectedRoute>} />
         <Route path="/departments" element={<ProtectedRoute><Departments /></ProtectedRoute>} />
         <Route path="/referring-physicians" element={<ProtectedRoute><ReferringPhysicians /></ProtectedRoute>} />
